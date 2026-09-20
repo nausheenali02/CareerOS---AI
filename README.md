@@ -1,117 +1,176 @@
-# ⚡ CareerOS AI — Agentic Job Application Copilot
+# 🤖 CareerOS — AI
 
-> An intelligent, autonomous multi-agent copilot that transforms standard job applications into high-signal, tailored submissions with real-time technical interview preparation.
+> **An AI-powered multi-agent career copilot that analyzes job descriptions, resumes, and GitHub projects to provide personalized career insights and interview preparation.**
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Google Gemini](https://img.shields.io/badge/Model-Gemini%202.5%20Flash-4285F4?style=flat&logo=google&logoColor=white)](https://ai.google.dev/)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+CareerOS — AI streamlines the job application process by connecting **Job Description Analysis, Resume Parsing, GitHub Profiling, Gap Analysis, Cover Letter Generation, and AI Interview Evaluation** into one intelligent workflow.
 
 ---
 
-## 🎯 Overview
+## ✨ Features
 
-**CareerOS AI** acts as an end-to-end "Operating System" for job seekers. Rather than relying on simple one-shot LLM prompts, CareerOS orchestrates an interconnected fleet of specialized, autonomous agents. The platform parses job requirements, evaluates candidate profiles, matches GitHub repositories, generates tailored cover letters, and runs an interactive mock interview studio with real-time scoring.
+* 🔍 **Job Analysis** — Extracts technical requirements, tech stack, domain concepts, and soft skills from JDs.
+* 📄 **Resume Parsing** — Extracts skills, education, experience, and projects from PDF resumes.
+* 💻 **GitHub Profiling** — Analyzes public repositories and ranks projects based on relevance to the target role.
+* 🧩 **Gap Analysis** — Compares the candidate profile with job requirements and identifies missing skills.
+* ✍️ **Cover Letter Generation** — Creates tailored cover letters using relevant skills and projects.
+* 🎯 **Interview Preparation** — Generates technical and behavioral questions based on the JD and identified gaps.
+* 📊 **Answer Evaluation** — Scores interview responses from 1–10 and provides feedback and model answers.
 
 ---
 
-## 🏗️ Multi-Agent Architecture
+## 🤖 Agent Fleet
+
+| Agent              | File                    | Responsibility                           |
+| ------------------ | ----------------------- | ---------------------------------------- |
+| 🔍 Job Analyzer    | `jd_agent.py`           | Analyzes job descriptions                |
+| 📄 Resume Parser   | `resume_agent.py`       | Extracts candidate profile from PDFs     |
+| 💻 GitHub Profiler | `project_agent.py`      | Analyzes and ranks GitHub projects       |
+| 🧩 Gap Analysis    | `matching_agent.py`     | Finds skill gaps and resume improvements |
+| ✍️ Cover Letter    | `cover_letter_agent.py` | Generates tailored cover letters         |
+| 🎯 Interview       | `interview_agent.py`    | Generates targeted interview questions   |
+| 📊 Evaluator       | `evaluator_agent.py`    | Evaluates interview answers              |
+
+---
+
+## 🧠 Architecture
 
 ```text
-                                  [ Candidate Input ]
-                         (Resume PDF/Text + Target JD + GitHub)
-                                          │
-                                          ▼
-                             ┌─────────────────────────┐
-                             │     orchestrator.py     │
-                             └────────────┬────────────┘
-                                          │
-                  ┌───────────────────────┼───────────────────────┐
-                  ▼                       ▼                       ▼
-       ┌────────────────────┐   ┌───────────────────┐   ┌───────────────────┐
-       │   JD Analyzer      │   │   Resume Parser   │   │  GitHub Profiler  │
-       │     Agent          │   │      Agent        │   │     Agent         │
-       └──────────┬─────────┘   └─────────┬─────────┘   └─────────┬─────────┘
-                  │                       │                       │
-                  └───────────────────────┼───────────────────────┘
-                                          ▼
-                               ┌─────────────────────┐
-                               │    Gap Analysis     │
-                               │        Agent        │
-                               └──────────┬──────────┘
-                                          │
-                         ┌────────────────┴────────────────┐
-                         ▼                                 ▼
-              ┌─────────────────────┐           ┌─────────────────────┐
-              │    Cover Letter     │           │   Interview Kit     │
-              │       Agent         │           │       Agent         │
-              └─────────────────────┘           └──────────┬──────────┘
-                                                           │
-                                                           ▼
-                                                ┌─────────────────────┐
-                                                │   Evaluator Agent   │
-                                                │   (Live Scoring)    │
-                                                └─────────────────────┘
-🤖 The Agent Fleet
-Agent	Module	Responsibility
-Job Analyzer Agent	app/agents/jd_agent.py	Extracts hard requirements, tech stacks, domain concepts, and soft skills into structured Pydantic models.
-Resume Parser Agent	app/agents/resume_agent.py	Extracts text from uploaded PDFs, parsing core experiences, skills, and projects.
-GitHub Profiler Agent	app/agents/project_agent.py	Connects to the GitHub API, indexes public repositories, parses READMEs, and ranks matching projects (1–10).
-Gap Analysis Agent	app/agents/matching_agent.py	Cross-analyzes JD requirements against the candidate's profile to identify missing skills and suggest high-impact resume tweaks.
-Cover Letter Agent	app/agents/cover_letter_agent.py	Crafts a tailored cover letter referencing proven metrics and matching GitHub repositories.
-Interview & Evaluator Agents	
-app/agents/interview_agent.py
+              Job Description
+                     │
+                     ▼
+              ┌─────────────┐
+              │ Job Analyzer│
+              └──────┬──────┘
+                     │
+     ┌───────────────┼───────────────┐
+     ▼               ▼               ▼
+  Resume          GitHub          Job Profile
+  Agent           Agent              │
+     └───────────────┼───────────────┘
+                     ▼
+              ┌─────────────┐
+              │ Gap Analysis│
+              └──────┬──────┘
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+       Resume     Cover      Interview
+       Tips       Letter       Agent
+                                │
+                                ▼
+                           Evaluator
+```
 
+The workflow is coordinated through a centralized **Orchestrator** with structured **Pydantic state models**.
 
-app/agents/evaluator_agent.py
+---
 
-Synthesizes targeted technical and behavioral interview questions focused on identified gaps; provides real-time evaluations, scoring (1–10), and model answers.
-🛠️ Tech Stack
-Backend: FastAPI (Python 3.10+)
-AI Orchestration: Google Gemini (gemini-3-flash-preview) via LangChain Google GenAI
-Frontend: Vanilla HTML5, Tailwind CSS (CDN), Lucide Icons, Vanilla JavaScript
-Templating: Jinja2
-Integrations: PyGithub (GitHub REST API), PyPDF (Document Parsing)
-📂 Repository Structure
-Plaintext
+## 🛠️ Tech Stack
+
+**Backend:** FastAPI, Python 3.10+, Pydantic, Jinja2
+**AI:** Google Gemini `gemini-3-flash-preview`, LangChain Google GenAI
+**Frontend:** HTML5, Tailwind CSS, Vanilla JavaScript, Lucide Icons
+**Integrations:** PyGithub, PyPDF
+
+---
+
+## 📂 Project Structure
+
+```text
 CareerOS---AI/
 ├── app/
 │   ├── agents/
-│   │   ├── cover_letter_agent.py   # Tailored pitch writer
-│   │   ├── evaluator_agent.py      # Real-time answer scoring & feedback
-│   │   ├── interview_agent.py      # Dynamic interview question generator
-│   │   ├── jd_agent.py             # Structured job description analyzer
-│   │   ├── matching_agent.py       # Gap analysis and resume suggestions
-│   │   ├── project_agent.py        # GitHub API repository ranker
-│   │   └── resume_agent.py         # PDF parsing and profile extraction
-│   ├── llm.py                      # Centralized Gemini LLM client configuration
-│   ├── orchestrator.py             # Multi-agent state pipeline coordinator
-│   └── state.py                    # Pydantic schemas and application state
+│   │   ├── jd_agent.py
+│   │   ├── resume_agent.py
+│   │   ├── project_agent.py
+│   │   ├── matching_agent.py
+│   │   ├── cover_letter_agent.py
+│   │   ├── interview_agent.py
+│   │   └── evaluator_agent.py
+│   ├── llm.py
+│   ├── orchestrator.py
+│   └── state.py
 ├── templates/
-│   └── index.html                  # Responsive UI workspace
-├── .env.example                    # Sample environment variables
-├── .gitignore                      # Git exclusion rules
-├── main.py                         # FastAPI application entrypoint & API routes
-└── requirements.txt                # Project dependencies
-🚀 Quickstart Guide
-1. Clone the Repository
-Bash
-git clone [https://github.com/nausheenali02/CareerOS---AI.git](https://github.com/nausheenali02/CareerOS---AI.git)
+│   └── index.html
+├── .env.example
+├── main.py
+└── requirements.txt
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone
+
+```bash
+git clone https://github.com/nausheenali02/CareerOS---AI.git
 cd CareerOS---AI
-2. Set Up Virtual Environment
-Bash
+```
+
+### 2. Create Virtual Environment
+
+```bash
 python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+source venv/bin/activate
+```
+
+For Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-3. Configure Environment Variables
-Create a .env file in the root directory:
-Bash
-GEMINI_API_KEY=your_gemini_api_key_here
-GOOGLE_API_KEY=your_gemini_api_key_here
-GITHUB_TOKEN=your_github_classic_token_here  # Optional: prevents rate-limiting
-4. Run the Application
-Bash
+```
+
+### 4. Configure `.env`
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
+GOOGLE_API_KEY=your_gemini_api_key
+GITHUB_TOKEN=your_github_token
+```
+
+`GITHUB_TOKEN` is optional but helps avoid GitHub API rate limits.
+
+### 5. Run
+
+```bash
 python main.py
-Open your browser and navigate to:
-Plaintext
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## 🔮 Future Scope
+
+* LinkedIn & portfolio analysis
+* Personalized learning roadmap
+* Job tracking and analytics
+* Voice-based mock interviews
+* Coding interview agent
+* Persistent candidate profiles
+
+---
+
+## 👩‍💻 Author
+
+**Nausheen Ali**
+B.Tech CSE | AI/ML
+
+* GitHub: `github.com/nausheenali02`
+* LinkedIn: `linkedin.com/in/nausheen-ali-72583628a/`
+* Email: `nausheenali839@gmail.com`
+
+---
+
+⭐ **CareerOS — AI: Analyze → Match → Improve → Apply → Prepare**
