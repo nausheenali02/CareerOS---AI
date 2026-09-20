@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+langchain-core
+langchain-google-genai
+pydantic
+python-dotenv
+pypdf
+PyGithub
